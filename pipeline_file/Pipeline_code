@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Development') {
+            steps {
+                // Execute Development tasks
+                echo 'Development Job...'
+                // If Job A fails, the pipeline will exit without triggering subsequent jobs
+            }
+            post {
+                success {
+                    echo 'Deployment succeeded! Triggering Job...'
+                    triggerDownstreamJob('JobB')  // Trigger Job B upon successful completion of Job A
+                }
+                failure {
+                    echo 'Job A failed! Pipeline will exit.'
+                }
+            }
+        }
+
+        stage('QA Environment') {
+            steps {
+                // Execute QA tasks
+                echo 'Executing QA task...'
+                // If QA fails, the pipeline will exit without triggering subsequent jobs
+            }
+            post {
+                success {
+                    echo 'QA succeeded! Triggering Regression QA...'
+                    triggerDownstreamJob('Regression QA')  // Trigger Job C upon successful completion of Job B
+                }
+                failure {
+                    echo 'QA Deployment failed! Pipeline will exit.'
+                }
+            }
+        }
+
+        stage('Regression QA') {
+            steps {
+                // Execute Regression tasks
+                echo 'Executing Regression ...'
+                // Add more stages, jobs, tasks as needed
+            }
+            post {
+                success {
+                    echo 'Regression  succeeded!'
+                    // Continue with additional actions or post-actions as needed
+                }
+                failure {
+                    echo 'Regression failed! Pipeline will exit.'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'All jobs succeeded!'
+        }
+        failure {
+            echo 'One or more jobs failed! Pipeline will exit.'
+        }
+    }
+}
+
+def triggerDownstreamJob(jobName) {
+    // Trigger a downstream Jenkins job
+    build job: jobName, wait: true  // 'wait: true' ensures that the pipeline waits for the downstream job to complete
+}
+

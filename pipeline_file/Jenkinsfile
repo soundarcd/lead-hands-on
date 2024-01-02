@@ -1,0 +1,58 @@
+pipeline {
+    
+
+    environment {
+        // Define environment variables as needed
+        SSH_USER = 'ubuntu'
+        SSH_HOST = '10.0.2.3'
+        SSH_PORT = '22'  // Default SSH port
+        DEPLOY_DIR = '/home/ubuntu/frontend'
+       EMAIL_TO = 'devops@clouddestinations.com'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your GitHub repository
+                git credentialsId: 'git_credentials', url: 'https://github.com/soundarcd/lead-hands-on.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Navigate to the React app directory and install dependencies
+                sh 'cd lead-hands-on/ping-frontend/ && npm install && npm run build'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Use SSH to deploy the built React app to the SSH server
+                sh '''
+                    scp -P ${SSH_PORT} -r lead-hands-on/ping-frontend/build ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}
+                '''
+            }
+        }
+    
+        stage('Email Notification') {
+            steps {
+                // Send email notification based on success or failure
+                script {
+                    currentBuild.result == 'SUCCESS' ? 
+                        sendEmail(subject: "Deployment Successful", body: "Deployment to ${SSH_HOST} succeeded.", to: "${EMAIL_TO}") :
+                        sendEmail(subject: "Deployment Failed", body: "Deployment to ${SSH_HOST} failed.", to: "${EMAIL_TO}")
+                }
+            }
+        }
+  }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
+

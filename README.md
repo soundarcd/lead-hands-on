@@ -1,4 +1,4 @@
-# Goal
+## Goal
 This is a simple ping-pong application consisting of frontend and backend. The requirement is to create runtime infrastructure and deploy the applications.
 
 # Definition of Done
