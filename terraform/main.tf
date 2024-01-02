@@ -82,3 +82,39 @@ module "backenedalb" {
   user_data            = var.backened_user_data
 
 }
+
+####Not tested #######
+
+ Create Auto Scaling Group
+resource "aws_autoscaling_group" "example_asg" {
+  launch_configuration = aws_launch_configuration.example_launch_config.name
+  min_size              = 1
+  max_size              = 3
+  desired_capacity      = 2
+  # Add other ASG configuration parameters as needed
+
+  # Add CloudWatch Alarms for ASG metrics
+  metric_alarm {
+    comparison_operator = "GreaterThanOrEqualToThreshold"
+    evaluation_periods  = "1"
+    metric_name         = "GroupTotalInstances"
+    namespace           = "AWS/AutoScaling"
+    period              = "300"
+    statistic           = "Average"
+    threshold           = "2"
+    alarm_description   = "Alarm when ASG instances are greater than or equal to 2"
+    alarm_actions       = [aws_sns_topic.example_topic.arn]
+  }
+}
+
+# Create SNS Topic for email notifications
+resource "aws_sns_topic" "example_topic" {
+  name = "ASGEmailNotifications"
+}
+
+# Create SNS Topic Subscription for email notifications
+resource "aws_sns_topic_subscription" "example_subscription" {
+  topic_arn = aws_sns_topic.example_topic.arn
+  protocol  = "email"
+  endpoint  = "devops@clouddestinations.com"  # Replace with your email address
+}
