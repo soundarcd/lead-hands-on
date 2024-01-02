@@ -1,0 +1,47 @@
+pipeline {
+    
+
+    environment {
+        // Define environment variables as needed
+        SSH_USER = 'ubuntu'
+        SSH_HOST = '10.0.2.3'
+        SSH_PORT = '22'  // Default SSH port
+        DEPLOY_DIR = '/home/ubuntu/frontend'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your GitHub repository
+                git credentialsId: 'git_credentials', url: 'https://github.com/soundarcd/lead-hands-on.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Navigate to the React app directory and install dependencies
+                sh 'cd lead-hands-on/ping-frontend/ && npm install && npm run build'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Use SSH to deploy the built React app to the SSH server
+                sh '''
+                    scp -P ${SSH_PORT} -r lead-hands-on/ping-frontend/build ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
+
