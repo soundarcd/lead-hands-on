@@ -7,6 +7,7 @@ pipeline {
         SSH_HOST = '10.0.2.3'
         SSH_PORT = '22'  // Default SSH port
         DEPLOY_DIR = '/home/ubuntu/frontend'
+       EMAIL_TO = 'devops@clouddestinations.com'
     }
 
     stages {
@@ -32,8 +33,18 @@ pipeline {
                 '''
             }
         }
-    }
-
+    
+        stage('Email Notification') {
+            steps {
+                // Send email notification based on success or failure
+                script {
+                    currentBuild.result == 'SUCCESS' ? 
+                        sendEmail(subject: "Deployment Successful", body: "Deployment to ${SSH_HOST} succeeded.", to: "${EMAIL_TO}") :
+                        sendEmail(subject: "Deployment Failed", body: "Deployment to ${SSH_HOST} failed.", to: "${EMAIL_TO}")
+                }
+            }
+        }
+  }
     post {
         success {
             echo 'Pipeline completed successfully!'
