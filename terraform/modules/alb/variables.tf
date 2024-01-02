@@ -71,31 +71,31 @@ variable "instance_security_group_name" {
 
 variable "image_id" {
   description = "image id for triggering the instances"
-  type    = string
+  type        = string
 }
 
 variable "instance_type" {
   description = "type of the instances"
-  type    = string
+  type        = string
 }
 
 variable "key_name" {
   description = "keyname for the instances"
-  type  = string
+  type        = string
 }
 
 variable "min_size" {
-  description = "minimal number of instance" 
-  type = string
+  description = "minimal number of instance"
+  type        = string
 }
 
 variable "max_size" {
-  description = "maximum number of servers" 
-  type = string
+  description = "maximum number of servers"
+  type        = string
 }
 
-variable "desired_capacity"  {
+variable "desired_capacity" {
   description = "desired capacity"
-  type = string
+  type        = string
 }
 

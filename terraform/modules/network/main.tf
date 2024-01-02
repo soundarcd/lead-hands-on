@@ -2,7 +2,7 @@
 
 # Create a VPC
 resource "aws_vpc" "my_vpc" {
-  cidr_block = var.vpc_cidr_block
+  cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -22,8 +22,8 @@ resource "aws_internet_gateway" "my_igw" {
 
 # Create a Public Subnet
 resource "aws_subnet" "public_subnet" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = var.public_subnet_cidr_block
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = var.public_subnet_cidr_block
   map_public_ip_on_launch = true
 
   availability_zone = var.availability_zone
@@ -34,8 +34,8 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_subnet" "public_subnet_2" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = var.public_subnet_cidr_block_2
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = var.public_subnet_cidr_block_2
   map_public_ip_on_launch = true
 
   availability_zone = var.availability_zone_2
